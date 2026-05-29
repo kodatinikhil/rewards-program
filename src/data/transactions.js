@@ -1,0 +1,42 @@
+export const transactions = [
+  {
+    transactionId: 1,
+    customerId: 101,
+    customerName: "John Doe",
+    purchaseDate: "2023-12-15",
+    product: "Headphones",
+    amount: 120.5,
+  },
+  {
+    transactionId: 2,
+    customerId: 101,
+    customerName: "John Doe",
+    purchaseDate: "2024-01-10",
+    product: "Keyboard",
+    amount: 75,
+  },
+  {
+    transactionId: 3,
+    customerId: 102,
+    customerName: "Jane Smith",
+    purchaseDate: "2024-01-12",
+    product: "Mouse",
+    amount: 45,
+  },
+  {
+    transactionId: 4,
+    customerId: 102,
+    customerName: "Jane Smith",
+    purchaseDate: "2024-02-01",
+    product: "Monitor",
+    amount: 150.25,
+  },
+  {
+    transactionId: 5,
+    customerId: 103,
+    customerName: "Alex Brown",
+    purchaseDate: "2024-02-20",
+    product: "Laptop Stand",
+    amount: 100.4,
+  },
+];
