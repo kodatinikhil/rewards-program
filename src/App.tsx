@@ -1,50 +1,62 @@
-import { useRewardsData } from "./hooks/useRewardsData";
+import { useEffect, useState } from "react";
 
+import { transactions as initialData } from "./data/transactions";
+
+import { AddTransactionForm } from "./components/transactions/AddTransactionForm";
 import { TransactionsTable } from "./components/transactions/TransactionsTable";
 import { MonthlyRewardsTable } from "./components/rewards/MonthlyRewardsTable";
 import { TotalRewardsTable } from "./components/rewards/TotalRewardsTable";
 
-import { Loader } from "./components/common/Loader";
-import { ErrorMessage } from "./components/common/ErrorMessage";
+import { calculateRewardPoints } from "./utils/calculateRewardPoints";
+import { sortTransactionsByDate } from "./utils/sortTransactionsByDate";
+import { aggregateMonthlyRewards } from "./utils/aggregateMonthlyRewards";
+import { calculateTotalRewards } from "./utils/calculateTotalRewards";
+
 import "./App.css";
 
 function App() {
-  const {
-    transactions,
-    monthlyRewards,
-    totalRewards,
-    loading,
-    error,
-  } = useRewardsData();
+  const [transactions, setTransactions] = useState(initialData);
+  const [monthly, setMonthly] = useState([]);
+  const [total, setTotal] = useState([]);
 
-  if (loading) {
-    return <Loader />;
-  }
+  useEffect(() => {
+    const sorted = sortTransactionsByDate(transactions);
 
-  if (error) {
-    return <ErrorMessage message={error} />;
-  }
+    const enriched = sorted.map((t) => ({
+      ...t,
+      rewardPoints: calculateRewardPoints(t.amount),
+    }));
 
-return (
-  <div className="container">
-    <h1>Rewards Program Dashboard</h1>
+    setMonthly(aggregateMonthlyRewards(enriched));
+    setTotal(calculateTotalRewards(enriched));
+  }, [transactions]);
 
-    <div className="card">
-      <h2>Transactions</h2>
-      <TransactionsTable transactions={transactions} />
+  const handleAdd = (txn) => {
+    setTransactions((prev) => [...prev, txn]);
+  };
+
+  return (
+    <div className="container">
+      <h1>Rewards Dashboard</h1>
+
+      <AddTransactionForm onAdd={handleAdd} />
+
+      <div className="card">
+        <h2>Transactions</h2>
+        <TransactionsTable transactions={transactions} />
+      </div>
+
+      <div className="card">
+        <h2>Monthly Rewards</h2>
+        <MonthlyRewardsTable monthlyRewards={monthly} />
+      </div>
+
+      <div className="card">
+        <h2>Total Rewards</h2>
+        <TotalRewardsTable totalRewards={total} />
+      </div>
     </div>
-
-    <div className="card">
-      <h2>Monthly Rewards</h2>
-      <MonthlyRewardsTable monthlyRewards={monthlyRewards} />
-    </div>
-
-    <div className="card">
-      <h2>Total Rewards</h2>
-      <TotalRewardsTable totalRewards={totalRewards} />
-    </div>
-  </div>
-);
+  );
 }
 
 export default App;
