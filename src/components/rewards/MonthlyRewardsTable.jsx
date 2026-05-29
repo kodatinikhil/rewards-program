@@ -1,5 +1,7 @@
 import PropTypes from "prop-types";
 import { Table } from "../common/Table";
+import { usePagination } from "../../utils/usePagination";
+import { Pagination } from "../common/pagination";
 
 export const MonthlyRewardsTable = ({ monthlyRewards }) => {
   const columns = [
@@ -18,7 +20,28 @@ export const MonthlyRewardsTable = ({ monthlyRewards }) => {
     rewardPoints: item.rewardPoints,
   }));
 
-  return <Table columns={columns} data={data} />;
+  const {
+    paginatedData,
+    currentPage,
+    totalPages,
+    nextPage,
+    prevPage,
+    goToPage,
+  } = usePagination(data, 5);
+
+  return (
+    <>
+      <Table columns={columns} data={paginatedData} />
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        nextPage={nextPage}
+        prevPage={prevPage}
+        goToPage={goToPage}
+      />
+    </>
+  );
 };
 
 MonthlyRewardsTable.propTypes = {

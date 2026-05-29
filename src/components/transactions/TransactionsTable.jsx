@@ -1,6 +1,8 @@
 import PropTypes from "prop-types";
 import { Table } from "../common/Table";
 import { calculateRewardPoints } from "../../utils/calculateRewardPoints";
+import { usePagination } from "../../utils/usePagination";
+import { Pagination } from "../common/pagination";
 
 export const TransactionsTable = ({ transactions }) => {
   const columns = [
@@ -21,7 +23,28 @@ export const TransactionsTable = ({ transactions }) => {
     rewardPoints: calculateRewardPoints(tx.amount),
   }));
 
-  return <Table columns={columns} data={data} />;
+  const {
+    paginatedData,
+    currentPage,
+    totalPages,
+    nextPage,
+    prevPage,
+    goToPage,
+  } = usePagination(data, 5);
+
+  return (
+    <>
+      <Table columns={columns} data={paginatedData} />
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        nextPage={nextPage}
+        prevPage={prevPage}
+        goToPage={goToPage}
+      />
+    </>
+  );
 };
 
 TransactionsTable.propTypes = {

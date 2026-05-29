@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState , useRef } from "react";
 
 import { transactions as initialData } from "./data/transactions";
 
@@ -18,6 +18,9 @@ function App() {
   const [transactions, setTransactions] = useState(initialData);
   const [monthly, setMonthly] = useState([]);
   const [total, setTotal] = useState([]);
+  const transactionCounter = useRef(1);
+  const customerCounter = useRef(1);
+  const customerMap = useRef({});
 
   useEffect(() => {
     const sorted = sortTransactionsByDate(transactions);
@@ -32,14 +35,32 @@ function App() {
   }, [transactions]);
 
   const handleAdd = (txn) => {
-    setTransactions((prev) => [...prev, txn]);
+    let customerId;
+
+    if (customerMap.current[txn.customerName]) {
+      customerId = customerMap.current[txn.customerName];
+    } else {
+      customerId = customerCounter.current++;
+      customerMap.current[txn.customerName] = customerId;
+    }
+
+    const newTransaction = {
+      transactionId: transactionCounter.current++,
+      customerId,
+      customerName: txn.customerName,
+      amount: txn.amount,
+      purchaseDate: txn.purchaseDate,
+      product: txn.product,
+    };
+
+    setTransactions((prev) => [...prev, newTransaction]);
   };
 
   return (
     <div className="container">
       <h1>Rewards Dashboard</h1>
 
-      <AddTransactionForm onAdd={handleAdd} />
+      {/* <AddTransactionForm onAdd={handleAdd} /> */}
 
       <div className="card">
         <h2>Transactions</h2>

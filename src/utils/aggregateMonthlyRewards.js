@@ -5,20 +5,25 @@ export const aggregateMonthlyRewards = (transactions) => {
 
   const grouped = transactions.reduce((acc, tx) => {
     const date = new Date(tx.purchaseDate);
-    const month = date.toLocaleString("default", { month: "long" });
+
+    const monthIndex = date.getMonth();
     const year = date.getFullYear();
 
-    const points = calculateRewardPoints(tx.amount);
+    const monthName = date.toLocaleString("default", { month: "long" });
 
-    const key = `${tx.customerId}-${month}-${year}`;
+    const points =
+      tx.rewardPoints ?? calculateRewardPoints(tx.amount);
+
+    const key = `${tx.customerId}-${year}-${monthIndex}`;
 
     if (!acc[key]) {
       acc[key] = {
         customerId: tx.customerId,
         customerName: tx.customerName,
-        month,
+        month: monthName,
         year,
         rewardPoints: 0,
+        _monthIndex: monthIndex,
       };
     }
 
@@ -27,12 +32,10 @@ export const aggregateMonthlyRewards = (transactions) => {
     return acc;
   }, {});
 
-  return Object.values(grouped).sort((a, b) => {
-    if (a.year !== b.year) return a.year - b.year;
-
-    const monthA = new Date(`${a.month} 1, ${a.year}`);
-    const monthB = new Date(`${b.month} 1, ${b.year}`);
-
-    return monthA - monthB;
-  });
+  return Object.values(grouped)
+    .sort((a, b) => {
+      if (a.year !== b.year) return a.year - b.year;
+      return a._monthIndex - b._monthIndex;
+    })
+    .map(({ _monthIndex, ...rest }) => rest);
 };
